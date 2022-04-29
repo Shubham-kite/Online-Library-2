@@ -2,6 +2,7 @@ from django.shortcuts import render,HttpResponse,redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User,auth
 from django.contrib import messages
+from django.conf import settings
 from .forms import Signup,Login,ContactUsForm
 from django.core.mail import send_mail, BadHeaderError
 from library.models import Student,books,ContactUs
@@ -34,6 +35,12 @@ def signup(request):
             else:
                 User.objects.create_user(username=username,password=password,first_name=firstName,last_name=lastName,email=email).save()
                 Student(firstName=firstName,lastName=lastName,email=email,phone=phone,password=password,).save()
+                #mail
+                subject = 'welcome to Online library'
+                message =  f'Hi {username} thank you for registering in online library. Your id   : {username} Your pass : {password}' 
+                emai_from = settings.EMAIL_HOST_USER
+                recipient_mail = [email]
+                send_mail(subject,message,emai_from,recipient_mail)
                 return redirect("/login")
     form = Signup() 
     return render(request,"signup.html",{"form":form})    
